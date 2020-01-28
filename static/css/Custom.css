@@ -1,0 +1,40 @@
+
+  body{
+  background-color: #ffffff;
+  overflow: Visible;
+  }
+
+  .bd-example{
+    overflow:hidden;
+    }
+
+    h1{
+     text-align: center;
+    }
+
+    h5{
+    margin: 50;
+    top: 25;
+    color: #000000;
+    padding-top: 90px;
+    font-size: 100px;
+    font-family: "trebuchet ms", sans-serif;
+    }
+
+    .subtitle{
+    color: #000000;
+    }
+
+    img {
+    height: 100vh;
+    }
+
+    .navbar-brand>img{
+    height: 200px;
+    display: inline-block;
+    margin-top: -100px;
+    margin-left: -40px;
+    width: 250px;
+    margin-bottom: -100px;
+    margin-right: -25px
+    }

@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="en">
+
+<!--HEAD-->
+  <head>
+    <!-- Required Meta Tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- Bootstrap CSS -->
+<!--    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">-->
+            <link rel="stylesheet" href="static/css/bootstrap.min.css" >
+<!--    CUSTOM CSS-->
+            <link rel="stylesheet" href="static/css/Custom.css" >
+      <!--   CHART.JS CSS -->
+    <script src='static/js/Chart.min.js'></script>
+
+      <title>Citywise Top Hashtags</title>
+  </head>
+
+
+<!--  HEADER WITH NAVIGATION BAR-->
+  <header>
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+  <a class="navbar-brand" href="#">
+  <img src="static/images/logo.png">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarText">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="/Home">Home</a>
+      </li>
+        <li class="nav-item dropdown">
+        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          Analytics
+        </a>
+        <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+          <a class="dropdown-item" href="/CitySentiments">City Sentiments</a>
+          <a class="dropdown-item" href="/HashtagSentiment">Hashtag Sentiment</a>
+          <a class="dropdown-item" href="/TopTweetingCities">Top Tweeting Cities</a>
+          <a class="dropdown-item" href="/OverallSentiments">Overall Sentiments</a>
+          <a class="dropdown-item" href="/TopHashtags">Top Hashtags</a>
+          <a class="dropdown-item" href="/MostSpokenWord">Most Spoken Word</a>
+          <a class="dropdown-item" href="/CitywiseHashtagsSentiments">Citywise Hashtags Sentiments</a>
+          <a class="dropdown-item" href="/CitywiseTopHashtags">Citywise Top Hashtags</a>
+          <a class="dropdown-item" href="/CitywiseMostSpokenWord">Citywise Most Spoken Word</a>
+        </div>
+    </ul>
+    <span class="navbar-text">
+      Developed by Sid
+    </span>
+  </div>
+</nav>
+
+  </header>
+
+
+<!--  BODY-->
+  <body>
+
+  <!---DROP DOWN --->
+<form class="form-inline" method="POST" action="{{ url_for('CitywiseTopHashtags') }}" style="float: right; al">
+  <div class="form-group">
+    <div class="input-group">
+        <span class="input-group-addon"><a>Please select</a></span>
+
+<select name="comp_select" methods="GET" action="/" onchange='this.form.submit()' style="text-align-last: center;">
+  <option value="{{dropdown_val[0]}}" >{{dropdown_val[0]}}</option>
+    <option value="value" selected>{{selected_value}}</option>
+
+  {% for data in dropdown_val[1:] %}
+    <option value="{{data}}">{{data}}</option>
+  {% endfor %}
+
+</select>
+</div>
+  </div>
+</form>
+
+
+    <h1>Top Hashtags of {{selected_value}}</h1>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+
+
+<div class="container">
+    <div class="row my-3">
+        <div class="col">
+            <h4>City Overall Sentiments</h4>
+        </div>
+    </div>
+    <div class="row my-2">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="myChart" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+    <br>
+
+<div class="container">
+    <div class="row my-3">
+        <div class="col">
+            <h4>City Overall Sentiments</h4>
+        </div>
+    </div>
+    <div class="row my-2">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <canvas id="chLine" height="200"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+  <!--    JAVA SCRIPT-->
+    <script>
+      // Global parameters:
+      // do not resize the chart canvas when its container does (keep at 600x400px)
+      Chart.defaults.global.responsive = true;
+      Chart.defaults.global.maintainAspectRatio = true;
+
+      <!--TO MAKE THE CHART START FROM 0-->
+      Chart.scaleService.updateScaleDefaults('linear', {
+    ticks: {
+        min: 0
+    }
+});
+
+      // define the chart data
+      var chartData = {
+        labels : [{% for item in labels %}
+                   "{{item}}",
+                  {% endfor %}],
+        datasets : [{
+            label: '{{ legend }}',
+            fill: true,
+            lineTension: 0.1,
+            backgroundColor: "rgba(75,192,192,0.4)",
+            borderColor: "rgba(75,192,192,1)",
+            borderCapStyle: 'butt',
+            borderDash: [],
+            borderDashOffset: 0.0,
+            borderJoinStyle: 'miter',
+            pointBorderColor: "rgba(75,192,192,1)",
+            pointBackgroundColor: "#fff",
+            pointBorderWidth: 1,
+            pointHoverRadius: 5,
+            pointHoverBackgroundColor: "rgba(75,192,192,1)",
+            pointHoverBorderColor: "rgba(220,220,220,1)",
+            pointHoverBorderWidth: 2,
+            pointRadius: 1,
+            pointHitRadius: 10,
+            data : [{% for item in values %}
+                      {{item}},
+                    {% endfor %}],
+            spanGaps: false
+        }]
+      }
+      // get chart canvas
+      var holder = document.getElementById("myChart");
+      var ctx = document.getElementById("myChart").getContext("2d");
+      // create the chart using the chart canvas
+      var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: chartData,
+        options: {
+          tooltips: {
+            enabled: true,
+            mode: 'single',
+            callbacks: {
+              label: function(tooltipItems, data) {
+                       return tooltipItems.yLabel + ' Index';
+                     }
+            }
+          },
+        }
+      });
+  </script>
+
+  <script>
+      // chart colors
+var colors = ['#007bff','#28a745','#333333','#c3e6cb','#dc3545','#6c757d'];
+
+/* large line chart */
+var chLine = document.getElementById("chLine");
+var chartData = {
+  labels: [{% for item in labels %}
+                   "{{item}}",
+                  {% endfor %}],
+  datasets: [{
+    data: [{% for item in values %}
+                      {{item}},
+                    {% endfor %}],
+    backgroundColor: 'transparent',
+    borderColor: colors[0],
+    borderWidth: 4,
+    pointBackgroundColor: colors[0]
+  }]
+};
+
+if (chLine) {
+  new Chart(chLine, {
+  type: 'line',
+  data: chartData,
+  options: {
+    scales: {
+      yAxes: [{
+        ticks: {
+          beginAtZero: false
+        }
+      }]
+    },
+    legend: {
+      display: false
+    }
+  }
+  });
+}
+  </script>
+
+  </body>
+</html>
